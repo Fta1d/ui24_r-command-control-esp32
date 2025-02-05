@@ -6,6 +6,8 @@
 
 #include "../main.h"
 
+#define VOL_TO_DAT(x) ((float)(x) / 3023.0)
+
 static adc_oneshot_unit_handle_t s_adc_handle;
 static adc_cali_handle_t s_cali_handle;
 
@@ -60,14 +62,15 @@ static void s_potentiometer_task(void) {
         // esp_err_t ret = adc_oneshot_read(s_adc2_handle, ADC_CHANNEL, &voltage);
         esp_err_t ret;
         s_read_adc_average(&voltage, &ret);
-        int current_voltage = voltage - offset;
+        voltage -= offset;
+        int current_voltage = voltage;
 
         if (ret == ESP_OK) {
             int diff = current_voltage - prev_voltage;
             NEG_TO_POS(diff);
 
             if (diff > treshold)
-                ESP_LOGI("adc", "ADC%d Channel[%d] Raw Data: %d", UNIT + 1, ADC_CHANNEL, voltage - offset);
+                ESP_LOGI("adc", "ADC%d Channel[%d] Raw Data: %.4f", UNIT + 1, ADC_CHANNEL, VOL_TO_DAT(voltage));
         }
 
         prev_voltage = current_voltage;
