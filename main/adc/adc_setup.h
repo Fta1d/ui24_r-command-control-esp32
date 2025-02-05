@@ -12,16 +12,14 @@
 #include "esp_event.h"
 #include "esp_log.h"
 
-#define ADC_CHANNEL ADC_CHANNEL_3
+#define ADC_CHANNEL ADC_CHANNEL_6
+#define UNIT ADC_UNIT_1
 #define GLOBAL_ATTEN ADC_ATTEN_DB_12
+#define NUM_SAMPLES 10
 
 #define NEG_TO_POS(x) if (x < 0) x = -x
 
-static QueueHandle_t s_evt_queue = NULL;
-static adc_oneshot_unit_handle_t s_adc2_handle;
-static adc_cali_handle_t s_cali_handle;
-
-void adc_setup();
+void adc_setup(void *arg);
 
 
 #endif //ADC_SETUP_H
