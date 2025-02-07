@@ -1,7 +1,3 @@
-//
-// Created by mark on 2/3/25.
-//
-
 #include "client.h"
 
 #include "../main.h"
@@ -9,6 +5,8 @@
 static EventGroupHandle_t s_wifi_event_group;
 static int s_retry_num = 0;
 static const char *payload = "ALIVE";
+
+int ex_sock;
 
 static void s_wifi_event_handler(void *arg, esp_event_base_t event_base,
                                 int32_t event_id, void *event_data) {
@@ -108,7 +106,6 @@ esp_err_t wifi_setup() {
 }
 
 esp_err_t server_connect() {
-    char buffer[128];
     char host_ip[] = HOST_IP;
     int addr_family = 0;
     int ip_protocol = 0;
@@ -120,40 +117,27 @@ esp_err_t server_connect() {
     addr_family = AF_INET;
     ip_protocol = IPPROTO_IP;
 
-    int sock = socket(addr_family, SOCK_STREAM, ip_protocol);
-    if (sock < 0) {
+    ex_sock = socket(addr_family, SOCK_STREAM, ip_protocol);
+    if (ex_sock < 0) {
         ESP_LOGE("socket: ", "Unable to create a socket: errno %d", errno);
         return ESP_FAIL;
     }
     ESP_LOGI("socket: ", "Socket created, connecting to %s:%d", host_ip, PORT);
 
-    // int err = connect(sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
-    // if (err < 0) {
-    //     ESP_LOGE("socket", "Socket unable to connect!");
-    //     close(sock);
-    //     return ESP_FAIL;
-    // }
-    // ESP_LOGI("socket: ", "Socket connected!");
-    xEventGroupSetBits(s_socket_event, SOCKET_CONNECTED_BIT);
-    while (1) {
-        // int err = send(sock, payload, strlen(payload), 0);
-        // if (err < 0) {
-        //     ESP_LOGE("socket", "Error occurred during sending: errno %d", errno);
-        //     break;
-        // }
+    int err = connect(ex_sock, (struct sockaddr *)&dest_addr, sizeof(dest_addr));
+    if (err < 0) {
+        ESP_LOGE("socket", "Socket unable to connect!");
+        close(ex_sock);
+        return ESP_FAIL;
+    }
 
-        // int len = recv(sock, buffer, sizeof(buffer) - 1, 0);
-        // // Error occurred during receiving
-        // if (len < 0) {
-        //     ESP_LOGE("socket", "recv failed: errno %d", errno);
-        //     break;
-        // }
-        // // Data received
-        // else {
-        //     buffer[len] = 0; // Null-terminate whatever we received and treat like a string
-        //     ESP_LOGI("socket", "Received %d bytes from %s:", len, host_ip);
-        //     ESP_LOGI("socket", "%s", buffer);
-        // }
+    ESP_LOGI("socket: ", "Socket connected!");
+    xEventGroupSetBits(s_socket_event, SOCKET_CONNECTED_BIT);
+
+
+
+    while (1) {
+
         UBaseType_t mem = uxTaskGetStackHighWaterMark(NULL);
         ESP_LOGI("mem", "free left: %d", mem);
         vTaskDelay(pdMS_TO_TICKS(1000));

@@ -1,7 +1,3 @@
-//
-// Created by mark on 1/30/25.
-//
-
 #ifndef ADC_SETUP_H
 #define ADC_SETUP_H
 

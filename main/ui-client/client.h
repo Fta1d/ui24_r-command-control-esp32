@@ -1,7 +1,3 @@
-//
-// Created by mark on 2/3/25.
-//
-
 #ifndef CLIENT_H
 #define CLIENT_H
 
@@ -33,5 +29,6 @@
 
 
 void ap_connection(void *arg);
+void ui_command_manager(const char *cmd_type, uint8_t chanel, const char *cmd, float value);
 
 #endif //CLIENT_H
